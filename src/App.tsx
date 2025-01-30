@@ -8,7 +8,7 @@ import { CoffeeContextProvider } from "./context/CoffeeContext";
 
 
 
-function App() {
+export function App() {
   return (
     <ThemeProvider theme={defaultTheme}>
       <BrowserRouter>
@@ -21,4 +21,3 @@ function App() {
   );
 }
 
-export default App;

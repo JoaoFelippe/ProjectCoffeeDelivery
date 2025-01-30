@@ -1,9 +1,4 @@
-import {
-  Coffee,
-  Package,
-  ShoppingCart,
-  Timer
-} from "phosphor-react";
+import { Coffee, Package, ShoppingCart, Timer } from "phosphor-react";
 import ImagemBackground from "../../assets/Imagem-CoffeDelivery.svg";
 import {
   HomeCoffeeList,
@@ -11,24 +6,15 @@ import {
   HomeIntro,
   HomeItemIcon,
   HomeItens,
-  HomeTitle
+  HomeTitle,
 } from "./styles";
 import { useContext } from "react";
 
-
-import { CoffeeCard } from "./components/CoffeCard";
+import { CoffeeCardCatalog } from "./components/CoffeCardCatalog";
 import { CoffeeContext } from "../../context/CoffeeContext";
 
-
-
-
 export function Home() {
-  const {coffeeShop, cart} = useContext(CoffeeContext);
-
-  
-
-  console.log(cart)
-
+  const { coffeeShop } = useContext(CoffeeContext);
 
   return (
     <HomeContainer>
@@ -76,12 +62,7 @@ export function Home() {
         <h2>Nossos cafés</h2>
         <div>
           {coffeeShop.map((coffee) => {
-            return (
-              <CoffeeCard
-                key={coffee.id}
-                coffee={coffee}
-              />
-            );
+            return <CoffeeCardCatalog key={coffee.id} coffee={coffee} />;
           })}
         </div>
       </HomeCoffeeList>

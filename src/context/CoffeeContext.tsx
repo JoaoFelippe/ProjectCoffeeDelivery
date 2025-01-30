@@ -1,5 +1,4 @@
-import { createContext, ReactNode, useState } from "react";
-// import { produce } from 'immer'
+import { createContext, ReactNode, useReducer } from "react";
 
 import ExpressoAmericano from "../assets/Expresso-Americano.svg";
 import ExpressoCremoso from "../assets/Expresso-Cremoso.svg";
@@ -18,6 +17,13 @@ import Mocaccino from "../assets/Mocaccino.svg";
 
 import Arabe from "../assets/Arabe.svg";
 import Irlandes from "../assets/Irlandes.svg";
+import { Coffee, coffeeReducer } from "../reducer/reducer";
+import {
+  AddCoffeeCartAction,
+  MinusCofferCartAction,
+  PlusCoffeeCartAction,
+  RemoveCofferCartAction,
+} from "../reducer/actions";
 
 export interface CoffeeCard {
   id: number;
@@ -27,7 +33,7 @@ export interface CoffeeCard {
   tags: string[];
 }
 
-interface Cart {
+export interface Cart {
   idCoffee: number;
   counter: number;
   price: number;
@@ -35,8 +41,11 @@ interface Cart {
 
 interface CoffeeContextType {
   coffeeShop: CoffeeCard[];
-  cart: Cart[];
-  AddCoffeeCart: (cart: Cart) => void;
+  coffeeCart: Coffee[];
+  AddCoffeeCart: (cart: Coffee) => void;
+  PlusCoffeeCart: (idCoffee: number) => void;
+  MinusCoffeeCart: (idCoffee: number) => void;
+  RemoveCoffeeCart: (idCoffee: number) => void;
 }
 
 export const CoffeeContext = createContext({} as CoffeeContextType);
@@ -48,6 +57,16 @@ interface CoffeeContextProviderProps {
 export function CoffeeContextProvider({
   children,
 }: CoffeeContextProviderProps) {
+  const [coffeeCartState, dispatch] = useReducer(
+    coffeeReducer,
+    {
+      coffeeCart: [],
+    },
+    (initialState) => {
+      return initialState;
+    }
+  );
+
   const coffeeShop: CoffeeCard[] = [
     {
       imagem: ExpressoTradicional,
@@ -153,16 +172,35 @@ export function CoffeeContextProvider({
     },
   ];
 
-  const [cart, setCart] = useState<Cart[]>([]);
+  const { coffeeCart } = coffeeCartState;
 
-  function AddCoffeeCart(cartItem: Cart) {
-    setCart((state) => {
-      return [...state, cartItem];
-    });
+  function AddCoffeeCart(cartItem: Coffee) {
+    dispatch(AddCoffeeCartAction(cartItem));
+  }
+
+  function PlusCoffeeCart(idCoffee: number) {
+    dispatch(PlusCoffeeCartAction(idCoffee));
+  }
+
+  function MinusCoffeeCart(idCoffee: number) {
+    dispatch(MinusCofferCartAction(idCoffee));
+  }
+
+  function RemoveCoffeeCart(idCoffee: number) {
+    dispatch(RemoveCofferCartAction(idCoffee));
   }
 
   return (
-    <CoffeeContext.Provider value={{ coffeeShop, cart, AddCoffeeCart }}>
+    <CoffeeContext.Provider
+      value={{
+        coffeeShop,
+        coffeeCart,
+        AddCoffeeCart,
+        PlusCoffeeCart,
+        MinusCoffeeCart,
+        RemoveCoffeeCart,
+      }}
+    >
       {children}
     </CoffeeContext.Provider>
   );

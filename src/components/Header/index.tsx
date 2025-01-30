@@ -7,9 +7,9 @@ import { useContext } from "react";
 import { CoffeeContext } from "../../context/CoffeeContext";
 
 export function Header() {
-  const { cart } = useContext(CoffeeContext);
+  const { coffeeCart } = useContext(CoffeeContext);
 
-  const numberItensCart = cart.length;
+  const numberItensCart = coffeeCart.length;
   const enableSpan = numberItensCart > 0 ? true : false;
 
   return (
@@ -20,7 +20,7 @@ export function Header() {
         <NavLink to="/">
           <MapPin size={15} weight="fill" /> Porto Alegre, RS
         </NavLink>
-        <NavLink to="/">
+        <NavLink to="/Checkout">
           <ShoppingCart size={15} weight="fill" />
           {enableSpan && <span>{numberItensCart}</span>}
         </NavLink>
