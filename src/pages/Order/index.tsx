@@ -18,7 +18,9 @@ export function Order() {
 
   const order = orderCart.filter((item) => item.id === idOrder);
 
-  if (order.length < 0) return <></>;
+  if (order.length === 0) return null;
+
+  console.log(order);
 
   const formaPagamento = (): string => {
     switch (order[0].pagamento) {
