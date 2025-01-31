@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useReducer } from "react";
+import { createContext, ReactNode, useEffect, useReducer } from "react";
 
 import ExpressoAmericano from "../assets/Expresso-Americano.svg";
 import ExpressoCremoso from "../assets/Expresso-Cremoso.svg";
@@ -17,13 +17,16 @@ import Mocaccino from "../assets/Mocaccino.svg";
 
 import Arabe from "../assets/Arabe.svg";
 import Irlandes from "../assets/Irlandes.svg";
-import { Coffee, coffeeReducer } from "../reducer/reducer";
+import { Coffee, coffeeReducer, Order } from "../reducer/reducer";
 import {
   AddCoffeeCartAction,
+  CheckoutCartAction,
   MinusCofferCartAction,
   PlusCoffeeCartAction,
   RemoveCofferCartAction,
 } from "../reducer/actions";
+import { useNavigate } from "react-router-dom";
+import { NewOrderFormData } from "../pages/Checkout";
 
 export interface CoffeeCard {
   id: number;
@@ -33,19 +36,15 @@ export interface CoffeeCard {
   tags: string[];
 }
 
-export interface Cart {
-  idCoffee: number;
-  counter: number;
-  price: number;
-}
-
 interface CoffeeContextType {
   coffeeShop: CoffeeCard[];
   coffeeCart: Coffee[];
+  orderCart: Order[];
   AddCoffeeCart: (cart: Coffee) => void;
   PlusCoffeeCart: (idCoffee: number) => void;
   MinusCoffeeCart: (idCoffee: number) => void;
   RemoveCoffeeCart: (idCoffee: number) => void;
+  CheckoutCart: (data: NewOrderFormData) => void;
 }
 
 export const CoffeeContext = createContext({} as CoffeeContextType);
@@ -61,11 +60,18 @@ export function CoffeeContextProvider({
     coffeeReducer,
     {
       coffeeCart: [],
+      orderCart: [],
     },
     (initialState) => {
+      const storedStateAsJSON = localStorage.getItem("@coffee-delivery:1.0.0");
+
+      if (storedStateAsJSON) return JSON.parse(storedStateAsJSON);
+
       return initialState;
     }
   );
+
+  const navigate = useNavigate();
 
   const coffeeShop: CoffeeCard[] = [
     {
@@ -172,7 +178,13 @@ export function CoffeeContextProvider({
     },
   ];
 
-  const { coffeeCart } = coffeeCartState;
+  const { coffeeCart, orderCart } = coffeeCartState;
+
+  useEffect(() => {
+    const stateJSON = JSON.stringify(coffeeCartState);
+
+    localStorage.setItem("@coffee-delivery:1.0.0", stateJSON);
+  }, [coffeeCartState]);
 
   function AddCoffeeCart(cartItem: Coffee) {
     dispatch(AddCoffeeCartAction(cartItem));
@@ -190,15 +202,27 @@ export function CoffeeContextProvider({
     dispatch(RemoveCofferCartAction(idCoffee));
   }
 
+  function CheckoutCart(data: NewOrderFormData) {
+    const newOrder: Order = {
+      id: String(new Date().getTime()),
+      coffee: coffeeCart,
+      ...data,
+    };
+    dispatch(CheckoutCartAction(newOrder));
+    navigate(`/Order/${newOrder.id}`);
+  }
+
   return (
     <CoffeeContext.Provider
       value={{
         coffeeShop,
         coffeeCart,
+        orderCart,
         AddCoffeeCart,
         PlusCoffeeCart,
         MinusCoffeeCart,
         RemoveCoffeeCart,
+        CheckoutCart,
       }}
     >
       {children}

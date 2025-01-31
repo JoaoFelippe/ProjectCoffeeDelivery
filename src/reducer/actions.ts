@@ -1,10 +1,11 @@
-import { Coffee } from "./reducer";
+import { Coffee, Order } from "./reducer";
 
 export enum CoffeeCartTypes {
   ADD_COFFEE_CART = "ADD_COFFEE_CART",
   PLUS_COUNTER_COFFEE_CART = "PLUS_COUNTER_COFFEE_CART",
   MINUS_COUNTER_COFFEE_CART = "MINUS_COUNTER_COFFEE_CART",
   REMOVE_COFFEE_CART = "REMOVE_COFFEE_CART",
+  CHECKOUT_CART = "CHECKOUT_CART",
 }
 
 export function AddCoffeeCartAction(newCoffeeCard: Coffee) {
@@ -39,6 +40,19 @@ export function RemoveCofferCartAction(idCoffee: number) {
     type: CoffeeCartTypes.REMOVE_COFFEE_CART,
     payload: {
       idCoffee,
+    },
+  };
+}
+
+export function CheckoutCartAction(
+  data: Order
+  //callback: NavigateFunction
+) {
+  return {
+    type: CoffeeCartTypes.CHECKOUT_CART,
+    payload: {
+      data,
+      //callback,
     },
   };
 }

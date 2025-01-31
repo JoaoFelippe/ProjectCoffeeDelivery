@@ -30,13 +30,10 @@ const newOrderValidation = zod.object({
     .string()
     .min(8, { message: "Informe o CEP" })
     .max(8, { message: "Informe o CEP" }),
-  rua: zod
+  logradouro: zod
     .string()
     .min(1, { message: "O campo precisa ter no minimo 1 caracter" }),
-  numero: zod
-    .string()
-    .min(1, { message: "Informe o número" })
-    .transform((val) => Number(val)),
+  numero: zod.string().min(1, { message: "Informe o número" }),
   complemento: zod.string().optional(),
   bairro: zod
     .string()
@@ -52,17 +49,17 @@ const newOrderValidation = zod.object({
   }),
 });
 
-type NewAdressFormData = zod.infer<typeof newOrderValidation>;
+export type NewOrderFormData = zod.infer<typeof newOrderValidation>;
 
 export function Checkout() {
-  const { coffeeCart } = useContext(CoffeeContext);
+  const { coffeeCart, CheckoutCart } = useContext(CoffeeContext);
 
-  const newOrderForm = useForm<NewAdressFormData>({
+  const newOrderForm = useForm<NewOrderFormData>({
     resolver: zodResolver(newOrderValidation),
     defaultValues: {
       cep: "",
-      rua: "",
-      numero: 0,
+      logradouro: "",
+      numero: "",
       bairro: "",
       cidade: "",
       uf: "",
@@ -71,8 +68,12 @@ export function Checkout() {
 
   const { handleSubmit } = newOrderForm;
 
-  function handleCreateNewOrder(data: NewAdressFormData) {
-    console.log(data);
+  function handleCreateNewOrder(data: NewOrderFormData) {
+    if (coffeeCart.length == 0) {
+      return alert("É preciso ter pelo menos um café no carrinho");
+    }
+
+    CheckoutCart(data);
   }
 
   const totalCart = coffeeCart.reduce(
@@ -121,7 +122,7 @@ export function Checkout() {
                 <Row>
                   <InputBox
                     sizeBox={12}
-                    id="rua"
+                    id="logradouro"
                     type="text"
                     placeholder="Rua"
                   />
@@ -157,40 +158,6 @@ export function Checkout() {
                   />
                   <InputBox sizeBox={2} id="uf" type="text" placeholder="UF" />
                 </Row>
-
-                {/* <Row>
-                <Col size={4}>
-                  <Input type="text" placeholder="CEP" {...register("cep")} />
-                </Col>
-              </Row> */}
-                {/* <Row>
-                <Col size={12}>
-                  <Input id="rua" type="text" placeholder="Rua" />
-                </Col>
-              </Row> */}
-                {/* <Row>
-                <Col size={4}>
-                  <Input id="numero" type="text" placeholder="Número" />
-                </Col>
-                <Col size={8}>
-                  <OptionalInput
-                    id="complemento"
-                    type="text"
-                    placeholder="Complemento (Opcional)"
-                  />
-                </Col>
-              </Row> */}
-                {/* <Row>
-                <Col size={4}>
-                  <Input id="bairro" type="text" placeholder="Bairro" />
-                </Col>
-                <Col size={6}>
-                  <Input id="cidade" type="text" placeholder="Cidade" />
-                </Col>
-                <Col size={2}>
-                  <Input id="uf" type="text" placeholder="UF" />
-                </Col>
-              </Row> */}
               </div>
             </CoffeeCardCheckout>
             <CoffeeCardCheckout>
@@ -232,34 +199,6 @@ export function Checkout() {
                   />
                 </Row>
               </div>
-              {/* <div>
-              <Row>
-                <Col size={4}>
-                  <LabelCheckbox>
-                    <input type="radio" id="cartaoCredito" name="pagamento" />
-                    <span>
-                      <CreditCard size={15} /> CARTÃO DE CRÉDITO
-                    </span>
-                  </LabelCheckbox>
-                </Col>
-                <Col size={4}>
-                  <LabelCheckbox>
-                    <input type="radio" id="cartaoDebito" name="pagamento" />
-                    <span>
-                      <Bank size={15} /> CARTÃO DE DÉBITO
-                    </span>
-                  </LabelCheckbox>
-                </Col>
-                <Col size={4}>
-                  <LabelCheckbox>
-                    <input type="radio" id="dinheiro" name="pagamento" />
-                    <span>
-                      <Money size={15} /> DINHEIRO
-                    </span>
-                  </LabelCheckbox>
-                </Col>
-              </Row>
-            </div> */}
             </CoffeeCardCheckout>
           </CheckoutAddress>
           <CheckoutCoffee>
